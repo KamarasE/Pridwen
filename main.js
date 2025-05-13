@@ -4,8 +4,8 @@ import { InputHandler } from "./input.js";
 window.addEventListener('load', function() {
     const canvas = document.getElementById('canvas1');
     const ctx = canvas.getContext('2d');
-    canvas.width = 1500;
-    canvas.height = 1500;
+    canvas.width = 500;
+    canvas.height = 500;
 
     class Game {
         constructor(width, height) {
