@@ -1,7 +1,7 @@
 import { Player } from "./player.js";
 import { InputHandler } from "./input.js";
 import { Background } from "./background.js";
-import { Foreground } from "./assets/1 Backgrounds/foreground.js";
+import { Foreground } from "./foreground.js";
 
 window.addEventListener('load', function() {
     const canvas = document.getElementById('canvas1');
