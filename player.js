@@ -92,5 +92,10 @@ export class Player {
         context.drawImage(this.image, frameX, frameY, this.width,
              this.height, this.x, this.y, this.width, this.height);
          gameFrame++;
+
+         if (playerState == 'fire') {
+         context.fillStyle = 'green';
+         context.fillRect(this.x,this.y,10,10);  
+         }
     }
 }
