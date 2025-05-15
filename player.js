@@ -1,4 +1,4 @@
-const staggerFrames = 10;
+const staggerFrames = 5;
 let gameFrame = 0;
 let playerState = 'moving';
 const spriteAnimations = []
@@ -75,6 +75,7 @@ export class Player {
         if (input.includes('s')) this.y += this.speed, playerState = 'right';
         if (input.includes('d')) this.x += this.speed*1.2, playerState = 'fast';
         if (input.includes('Enter')) playerState = 'fire';
+        if (input.includes('Shift')) this.x+= this.speed*1.3, playerState = 'flip';
         
 
         if (this.x < 0) this.x = 0;
