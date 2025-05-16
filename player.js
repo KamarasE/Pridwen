@@ -54,6 +54,9 @@ export class Player {
         this.y = this.game.height-this.height;
         this.image = document.getElementById('player');
         this.speed = 10;
+        //this.bulletX = this.x + this.width;
+        //this.bulletController = bulletController;
+
 
         animationStates.forEach((state, index) => {
             let frames = {
@@ -85,17 +88,13 @@ export class Player {
     }
 
     draw(context) {
-        //context.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh);
         let cursor = Math.floor(gameFrame/staggerFrames) % spriteAnimations[playerState].loc.length;
         let frameX = this.width * cursor;
         let frameY = spriteAnimations[playerState].loc[cursor].y;
         context.drawImage(this.image, frameX, frameY, this.width,
              this.height, this.x, this.y, this.width, this.height);
-         gameFrame++;
-
-         if (playerState == 'fire') {
-         context.fillStyle = 'green';
-         context.fillRect(this.x,this.y,10,10);  
-         }
+        gameFrame++;
+        //this.shoot();
+        //context.drawImage(this.image, 780, 673, 28, 3, bulletX, this.y + this.height/2,28,3)
     }
 }
