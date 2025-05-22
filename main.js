@@ -61,7 +61,7 @@ window.addEventListener('load', function() {
                         bullet.markedForDeletion = true;
                     }
                     });
-                    if (Math.random() < 0.01) { // kb. 1% esély frame-enként
+                    if (Math.random() < 0.02) { // kb. 1% esély frame-enként
                     this.enemyBulletController.shoot(enemy.x, enemy.y + enemy.height / 2);
                     enemy.state = 'fire';
                     enemy.fireTimer = 10; // pl. 10 frame-en át látszik a tűz animáció

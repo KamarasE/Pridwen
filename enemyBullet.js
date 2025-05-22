@@ -1,5 +1,5 @@
 export class EnemyBullet {
-    constructor(x, y, speed = 5) {
+    constructor(x, y, speed = 10) {
         this.x = x;
         this.y = y;
         this.width = 20;

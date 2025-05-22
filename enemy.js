@@ -71,7 +71,7 @@ export class Enemy {
     }
 
     update() {
-        this.x -= 2;
+        this.x -= 4;
         if (this.x + this.width < 0) this.markedForDeletion = true;
 
         if (this.fireTimer > 0) {
