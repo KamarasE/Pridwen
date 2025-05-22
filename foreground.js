@@ -11,7 +11,7 @@ export class Foreground {
         this.layer1 = document.getElementById('F_layer1');
         this.layer2 = document.getElementById('F_layer2');
     }
-    drawForeground (context){
+    draw (context){
         context.drawImage(this.layer1, this.x, this.y, this.width, this.height);
         context.drawImage(this.layer2, this.x2, this.y, this.width, this.height);
         if (this.x < -2500) this.x = 2500 + this.x2 - gameSpeed;

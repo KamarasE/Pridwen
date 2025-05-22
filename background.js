@@ -8,10 +8,10 @@ export class Background {
         this.y = 0;
         this.width = this.game.width;
         this.height = this.game.height;
-        this.layer1 = document.getElementById('B_layer1');
-        this.layer2 = document.getElementById('B_layer2');
+        this.layer1 = document.getElementById('B_layer1'); // TODO ITT ÉS MINDEN MÁSIK HÁTTÉRNÉL
+        this.layer2 = document.getElementById('B_layer2'); // 8 képpel szebb lenne 
     }
-    drawBackground (context){
+    draw (context){
         context.drawImage(this.layer1, this.x, this.y, this.width, this.height);
         context.drawImage(this.layer2, this.x2, this.y, this.width, this.height);
         if (this.x < -2500) this.x = 2500 + this.x2 - gameSpeed;

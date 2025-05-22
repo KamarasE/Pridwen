@@ -18,9 +18,15 @@
 #player {
     display: none;
 }
+#enemy {
+    display: none;
+}
 .background {
     display: none;
 }
 .foreground {
+    display: none;
+}
+.paint {
     display: none;
 }

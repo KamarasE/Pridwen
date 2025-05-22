@@ -57,7 +57,6 @@ export class Player {
         //this.bulletX = this.x + this.width;
         //this.bulletController = bulletController;
 
-
         animationStates.forEach((state, index) => {
             let frames = {
             loc: [],
@@ -94,7 +93,5 @@ export class Player {
         context.drawImage(this.image, frameX, frameY, this.width,
              this.height, this.x, this.y, this.width, this.height);
         gameFrame++;
-        //this.shoot();
-        //context.drawImage(this.image, 780, 673, 28, 3, bulletX, this.y + this.height/2,28,3)
     }
 }
