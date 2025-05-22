@@ -63,6 +63,8 @@ window.addEventListener('load', function() {
                     });
                     if (Math.random() < 0.01) { // kb. 1% esély frame-enként
                     this.enemyBulletController.shoot(enemy.x, enemy.y + enemy.height / 2);
+                    enemy.state = 'fire';
+                    enemy.fireTimer = 10; // pl. 10 frame-en át látszik a tűz animáció
                     }
             });
             this.enemies = this.enemies.filter(e => !e.markedForDeletion);             

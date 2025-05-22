@@ -1,5 +1,4 @@
 const staggerFrames = 5;
-let gameFrame = 0;
 let enemyState = 'moving';
 const spriteAnimations = []
 const animationStates = [
@@ -54,7 +53,9 @@ export class Enemy {
         this.height = 191;
         this.x = this.game.width + Math.random() * 300;
         this.y = Math.random() * (this.game.height - this.height);
+        this.frame = 0;
         this.markedForDeletion = false;
+        this.state = "fast";
 
         animationStates.forEach((state, index) => {
             let frames = {
@@ -73,17 +74,34 @@ export class Enemy {
         this.x -= 2;
         if (this.x + this.width < 0) this.markedForDeletion = true;
 
-        
-        enemyState = 'flip'; // TODO State
+        if (this.fireTimer > 0) {
+        this.fireTimer--;
+        this.state = 'fire';
+        } else {
+        this.state = 'fast'; // vagy ami az alapállapot
+        }
     }
 
     draw(context) { //TODO hibás animáció, felgyorsul minden enemy után
-        let cursor = Math.floor(gameFrame/staggerFrames) % spriteAnimations[enemyState].loc.length;
+        let cursor = Math.floor(this.frame / staggerFrames) % spriteAnimations[this.state].loc.length;
         let frameX = this.width * cursor;
-        let frameY = spriteAnimations[enemyState].loc[cursor].y;
-        context.drawImage(this.image, frameX, frameY, this.width,
-             this.height, this.x, this.y, this.width, this.height);
-        gameFrame++;
+        let frameY = spriteAnimations[this.state].loc[cursor].y;
+        context.save();
+
+        context.translate(this.x + this.width / 2, this.y + this.height / 2);
+
+        // tükrözés X tengely mentén (balra nézzen)
+        context.scale(-1, 1);
+
+        context.drawImage(
+        this.image,
+        frameX, frameY,
+        this.width, this.height,
+        -this.width / 2, -this.height / 2, // ezáltal helyesen jelenik meg
+        this.width, this.height);
+
+        context.restore();
+        this.frame++;
     }
 
     checkCollision(bullet) {

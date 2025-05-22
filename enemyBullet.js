@@ -2,8 +2,8 @@ export class EnemyBullet {
     constructor(x, y, speed = 5) {
         this.x = x;
         this.y = y;
-        this.width = 10;
-        this.height = 4;
+        this.width = 20;
+        this.height = 10;
         this.speed = speed;
         this.markedForDeletion = false;
     }
@@ -14,7 +14,7 @@ export class EnemyBullet {
     }
 
     draw(ctx) {
-        ctx.fillStyle = 'cyan';
+        ctx.fillStyle = 'red';
         ctx.fillRect(this.x, this.y, this.width, this.height);
     }
 
