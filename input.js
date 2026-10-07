@@ -1,28 +1,46 @@
 export class InputHandler {
-    constructor(){
+    constructor() {
         this.keys = [];
+        this.justPressed = [];
+
         window.addEventListener('keydown', e => {
-            if (( e.key === 'w' ||
+            if (
+                e.key === 'w' ||
                 e.key === 'a' ||
                 e.key === 's' ||
                 e.key === 'd' ||
                 e.key === 'Enter' ||
                 e.key === 'Shift'
-            ) && this.keys.indexOf(e.key) === -1){
-                this.keys.push(e.key);
+            ) {
+                if (this.keys.indexOf(e.key) === -1) {
+                    this.keys.push(e.key);
+                    this.justPressed.push(e.key);
+                }
             }
-            console.log(e.key, this.keys);
         });
+
         window.addEventListener('keyup', e => {
-            if ( e.key === 'w' ||
+            if (
+                e.key === 'w' ||
                 e.key === 'a' ||
                 e.key === 's' ||
                 e.key === 'd' ||
                 e.key === 'Enter' ||
-                e.key === 'Shift'){
-                this.keys.splice(this.keys.indexOf(e.key), 1);
+                e.key === 'Shift'
+            ) {
+                const index = this.keys.indexOf(e.key);
+
+                if (index !== -1) {
+                    this.keys.splice(index, 1);
+                }
             }
-            console.log(e.key, this.keys);
+            //DEBUG
+            //console.log(e.key, this.keys);
+            //
         });
+    }
+
+    update() {
+        this.justPressed = [];
     }
 }

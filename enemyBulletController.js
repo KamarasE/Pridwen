@@ -6,8 +6,10 @@ export class EnemyBulletController {
         this.shootCooldown = 0;
     }
 
-    shoot(x, y) {
-        this.bullets.push(new EnemyBullet(x, y));
+    shoot(x, y, velocityX = -1, velocityY = 0) {
+        this.bullets.push(
+            new EnemyBullet(x, y, 10, velocityX, velocityY)
+        );
     }
 
     update() {

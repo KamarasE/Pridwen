@@ -1,6 +1,5 @@
 const staggerFrames = 5;
-let enemyState = 'moving';
-const spriteAnimations = []
+
 const animationStates = [
     {
         name: 'back',
@@ -56,17 +55,19 @@ export class Enemy {
         this.frame = 0;
         this.markedForDeletion = false;
         this.state = "fast";
+        this.staggerFrames = 5;
+        this.spriteAnimations = {};
 
         animationStates.forEach((state, index) => {
             let frames = {
-            loc: [],
+                loc: [],
             }
             for (let i = 0; i < state.frames; i++) {
                 let posX = i * this.width;
                 let posY = index * this.height;
-                frames.loc.push({x: posX, y: posY});
+                frames.loc.push({ x: posX, y: posY });
             }
-        spriteAnimations[state.name] = frames;
+            this.spriteAnimations[state.name] = frames;
         });
     }
 
@@ -75,41 +76,82 @@ export class Enemy {
         if (this.x + this.width < 0) this.markedForDeletion = true;
 
         if (this.fireTimer > 0) {
-        this.fireTimer--;
-        this.state = 'fire';
+            this.fireTimer--;
+            this.state = 'fire';
         } else {
-        this.state = 'fast'; // vagy ami az alapállapot
+            this.state = 'fast'; // vagy ami az alapállapot
         }
     }
 
-    draw(context) { //TODO hibás animáció, felgyorsul minden enemy után
-        let cursor = Math.floor(this.frame / staggerFrames) % spriteAnimations[this.state].loc.length;
-        let frameX = this.width * cursor;
-        let frameY = spriteAnimations[this.state].loc[cursor].y;
+    draw(context) {
+        const animation = this.spriteAnimations[this.state];
+
+        const cursor =
+            Math.floor(this.frame / this.staggerFrames) %
+            animation.loc.length;
+
+        const frameX = animation.loc[cursor].x;
+        const frameY = animation.loc[cursor].y;
+
         context.save();
 
-        context.translate(this.x + this.width / 2, this.y + this.height / 2);
+        context.translate(
+            this.x + this.width / 2,
+            this.y + this.height / 2
+        );
 
-        // tükrözés X tengely mentén (balra nézzen)
+        // Make the enemy face left
         context.scale(-1, 1);
 
         context.drawImage(
-        this.image,
-        frameX, frameY,
-        this.width, this.height,
-        -this.width / 2, -this.height / 2, // ezáltal helyesen jelenik meg
-        this.width, this.height);
+            this.image,
+            frameX,
+            frameY,
+            this.width,
+            this.height,
+            -this.width / 2,
+            -this.height / 2,
+            this.width,
+            this.height
+        );
 
         context.restore();
+        //DEBUG
+
+        context.save();
+
+        context.strokeStyle = 'yellow';
+        context.lineWidth = 2;
+        context.strokeRect(
+            this.x,
+            this.y,
+            this.width,
+            this.height
+        );
+
+        context.restore();
+        //
+
         this.frame++;
     }
 
     checkCollision(bullet) {
-        return (
-            bullet.x < this.x + this.width &&
-            bullet.x + bullet.width > this.x &&
-            bullet.y < this.y + this.height &&
-            bullet.y + bullet.height > this.y
+
+        const closestX = Math.max(
+            this.x,
+            Math.min(bullet.x, this.x + this.width)
         );
+
+        const closestY = Math.max(
+            this.y,
+            Math.min(bullet.y, this.y + this.height)
+        );
+
+        const dx = bullet.x - closestX;
+        const dy = bullet.y - closestY;
+
+        const distance = Math.hypot(dx, dy);
+
+        return distance < bullet.radius;
     }
 }

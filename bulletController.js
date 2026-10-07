@@ -3,18 +3,15 @@ import { Bullet } from './bullet.js';
 export class BulletController {
     constructor() {
         this.bullets = [];
-        this.shootCooldown = 0;
     }
 
-    shoot(x, y) {
-        if (this.shootCooldown <= 0) {
-            this.bullets.push(new Bullet(x, y, 20));
-            this.shootCooldown = 20;
-        }
-    }
+    shoot(x, y, velocityX = 1, velocityY = 0) {
+    this.bullets.push(
+        new Bullet(x, y, 20, velocityX, velocityY)
+    );
+}
 
     update() {
-        this.shootCooldown--;
         this.bullets.forEach(b => b.update());
         this.bullets = this.bullets.filter(b => !b.markedForDeletion);
     }
