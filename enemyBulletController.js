@@ -21,13 +21,17 @@ export class EnemyBulletController {
         this.bullets.forEach(b => b.draw(ctx));
     }
 
-    checkCollisions(player) {
-        this.bullets.forEach(bullet => {
-            if (bullet.checkCollision(player)) {
-                bullet.markedForDeletion = true;
-                // Itt lehetne pl. player.health--
-                console.log("Player HIT!");
+    checkCollisions(player, health) {
+    this.bullets.forEach(bullet => {
+        if (bullet.checkCollision(player)) {
+            bullet.markedForDeletion = true;
+
+            if (health.currentHealth > 0) {
+                health.currentHealth--;
             }
-        });
-    }
+
+            console.log("Player HIT!");
+        }
+    });
+}
 }

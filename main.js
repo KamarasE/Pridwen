@@ -7,6 +7,7 @@ import { BulletController } from './bulletController.js';
 import { Enemy } from './enemy.js';
 import { EnemyBulletController } from './enemyBulletController.js';
 import { getDirection } from "./vector.js";
+import { Health } from "./health.js";
 
 
 const music = new Audio('./assets/music/pridwen.mp3');
@@ -25,6 +26,7 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
             this.width = width;
             this.height = height;
             this.player = new Player(this);
+            this.health = new Health(this);
             this.input = new InputHandler();
             this.bulletController = new BulletController();
             this.enemyBulletController = new EnemyBulletController();
@@ -63,7 +65,7 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
             this.bulletController.update();
 
             this.enemyBulletController.update();
-            this.enemyBulletController.checkCollisions(this.player);
+            this.enemyBulletController.checkCollisions(this.player, this.health);
 
             // Lövés (player)
             if (this.input.keys.includes('Enter')) {
@@ -128,6 +130,7 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
             this.player.draw(context);
             this.enemies.forEach(enemy => enemy.draw(context));
             this.enemyBulletController.draw(context);
+            this.health.draw(context);
 
             if (this.gameState === 'start') {
                 context.save();
