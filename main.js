@@ -42,14 +42,57 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
             this.gameState = 'start';
 
         }
+
+        startGame() {
+            this.gameState = 'playing';
+
+            music.currentTime = 0;
+            music.play();
+        }
+
+        resetRun() {
+            // Reset player
+            this.player.x = 0;
+            this.player.y = this.height - this.player.height;
+            this.player.state = 'moving';
+            this.player.frame = 0;
+            this.player.shootCooldown = 0;
+
+            // Restore health
+            this.health.currentHealth = this.health.maxHealth;
+
+            // Clear enemies and projectiles
+            this.enemies = [];
+            this.bulletController.bullets = [];
+            this.enemyBulletController.bullets = [];
+
+            // Reset enemy spawning
+            this.enemyTimer = 0;
+        }
+
         update() {
             if (this.gameState === 'start') {
                 if (this.input.justPressed.includes('Enter')) {
-                    this.gameState = 'playing';
+                    this.startGame();
 
-                    music.play();
+                    // Prevent the start press from firing a bullet
+                    const enterIndex = this.input.keys.indexOf('Enter');
 
-                    // Enter lenyomásáig nincs semmi
+                    if (enterIndex !== -1) {
+                        this.input.keys.splice(enterIndex, 1);
+                    }
+                }
+
+                this.input.update();
+                return;
+            }
+
+            if (this.gameState === 'gameOver') {
+                if (this.input.justPressed.includes('Enter')) {
+                    this.resetRun();
+                    this.gameState = 'start';
+
+                    // Prevent the restart press from firing a bullet
                     const enterIndex = this.input.keys.indexOf('Enter');
 
                     if (enterIndex !== -1) {
@@ -66,6 +109,12 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
 
             this.enemyBulletController.update();
             this.enemyBulletController.checkCollisions(this.player, this.health);
+
+            if (this.health.currentHealth <= 0) {
+                this.gameState = 'gameOver';
+                music.pause();
+                return;
+            }
 
             // Lövés (player)
             if (this.input.keys.includes('Enter')) {
@@ -132,7 +181,10 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
             this.enemyBulletController.draw(context);
             this.health.draw(context);
 
-            if (this.gameState === 'start') {
+            if (
+                this.gameState === 'start' ||
+                this.gameState === 'gameOver'
+            ) {
                 context.save();
 
                 // Transparent gray overlay
@@ -144,17 +196,45 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
                     this.height
                 );
 
-                // Start text
                 context.fillStyle = 'white';
-                context.font = 'bold 64px Arial';
                 context.textAlign = 'center';
                 context.textBaseline = 'middle';
 
-                context.fillText(
-                    'PRESS ENTER TO START',
-                    this.width / 2,
-                    this.height / 2
-                );
+                if (this.gameState === 'start') {
+                    context.font = 'bold 64px Arial';
+
+                    context.fillText(
+                        'PRESS ENTER TO START',
+                        this.width / 2,
+                        this.height / 2
+                    );
+                }
+
+                if (this.gameState === 'gameOver') {
+                    context.font = 'bold 80px Arial';
+
+                    context.fillText(
+                        'GAME OVER',
+                        this.width / 2,
+                        this.height / 2 - 60
+                    );
+
+                    context.font = 'bold 40px Arial';
+
+                    context.fillText(
+                        'Score: 0',
+                        this.width / 2,
+                        this.height / 2 + 20
+                    );
+
+                    context.font = '28px Arial';
+
+                    context.fillText(
+                        'PRESS ENTER TO CONTINUE',
+                        this.width / 2,
+                        this.height / 2 + 100
+                    );
+                }
 
                 context.restore();
             }
