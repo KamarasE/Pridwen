@@ -39,6 +39,9 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
             this.enemyTimer = 0;
             this.enemyInterval = 200; // kb. minden 200 frame után jön egy új
 
+            this.bombersSinceCorvette = 0;
+            this.corvetteThreshold = 7;
+
             this.gameState = 'start';
 
         }
@@ -68,6 +71,7 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
 
             // Reset enemy spawning
             this.enemyTimer = 0;
+            this.bombersSinceCorvette = 0;
         }
 
         update() {
@@ -121,10 +125,28 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
                 this.player.shoot(this.bulletController);
             }
 
-            // Ellenségek generálása időközönként
+            // Spawn enemies
             this.enemyTimer++;
+
             if (this.enemyTimer > this.enemyInterval) {
-                this.enemies.push(new Enemy(this));
+                const corvetteChance =
+                    this.bombersSinceCorvette /
+                    (this.bombersSinceCorvette + this.corvetteThreshold);
+
+                const spawnCorvette =
+                    Math.random() < corvetteChance;
+
+                if (spawnCorvette) {
+                    this.enemies.push(new Enemy(this, 'corvette'));
+
+                    // Start counting Bombers again after a Corvette spawns
+                    this.bombersSinceCorvette = 0;
+                } else {
+                    this.enemies.push(new Enemy(this, 'bomber'));
+
+                    this.bombersSinceCorvette++;
+                }
+
                 this.enemyTimer = 0;
             }
 

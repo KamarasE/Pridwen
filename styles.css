@@ -18,7 +18,10 @@
 #player {
     display: none;
 }
-#enemy {
+#bomber {
+    display: none;
+}
+#corvette {
     display: none;
 }
 .background {

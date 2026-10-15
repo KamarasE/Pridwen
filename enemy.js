@@ -1,3 +1,5 @@
+import { ENEMY_TYPES } from './enemyTypes.js';
+
 const staggerFrames = 5;
 
 const animationStates = [
@@ -45,9 +47,23 @@ const animationStates = [
 
 
 export class Enemy {
-    constructor(game) {
+    constructor(game, type = 'bomber') {
         this.game = game;
-        this.image = document.getElementById('enemy');
+        this.typeName = type;
+
+        this.type = ENEMY_TYPES[type];
+
+        if (!this.type) {
+            throw new Error(`Unknown enemy type: ${type}`);
+        }
+
+        this.image = document.getElementById(this.type.imageId);
+
+        this.maxHealth = this.type.maxHealth;
+        this.health = this.type.maxHealth;
+        this.scoreValue = this.type.scoreValue;
+        this.speed = this.type.speed;
+
         this.width = 191;
         this.height = 191;
         this.x = this.game.width + Math.random() * 300;
@@ -58,21 +74,22 @@ export class Enemy {
         this.staggerFrames = 5;
         this.spriteAnimations = {};
 
-        animationStates.forEach((state, index) => {
-            let frames = {
-                loc: [],
-            }
+        this.type.animations.forEach((state, index) => {
+            const frames = { loc: [] };
+
             for (let i = 0; i < state.frames; i++) {
-                let posX = i * this.width;
-                let posY = index * this.height;
-                frames.loc.push({ x: posX, y: posY });
+                frames.loc.push({
+                    x: i * this.type.frameWidth,
+                    y: index * this.type.frameHeight
+                });
             }
+
             this.spriteAnimations[state.name] = frames;
         });
     }
 
     update() {
-        this.x -= 4;
+        this.x -= this.speed;
         if (this.x + this.width < 0) this.markedForDeletion = true;
 
         if (this.fireTimer > 0) {
@@ -107,8 +124,8 @@ export class Enemy {
             this.image,
             frameX,
             frameY,
-            this.width,
-            this.height,
+            this.type.frameWidth,
+            this.type.frameHeight,
             -this.width / 2,
             -this.height / 2,
             this.width,
