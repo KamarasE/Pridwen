@@ -30,6 +30,9 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
             this.input = new InputHandler();
             this.bulletController = new BulletController();
             this.enemyBulletController = new EnemyBulletController();
+            this.score = 0;
+            this.highScore = Number(localStorage.getItem('pridwenHighScore')) || 0;
+            this.newHighScore = false;
 
             this.background = new Background(this); //TODO Jobb lenne ha ezek egy helyen lennének 
             this.foreground = new Foreground(this);
@@ -60,6 +63,8 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
             this.player.state = 'moving';
             this.player.frame = 0;
             this.player.shootCooldown = 0;
+            this.score = 0;
+            this.newHighScore = false;
 
             // Restore health
             this.health.currentHealth = this.health.maxHealth;
@@ -116,6 +121,19 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
 
             if (this.health.currentHealth <= 0) {
                 this.gameState = 'gameOver';
+
+                if (this.score > this.highScore) {
+                    this.highScore = this.score;
+                    this.newHighScore = true;
+
+                    localStorage.setItem(
+                        'pridwenHighScore',
+                        this.highScore
+                    );
+                } else {
+                    this.newHighScore = false;
+                }
+
                 music.pause();
                 return;
             }
@@ -154,39 +172,29 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
             this.enemies.forEach(enemy => {
                 enemy.update();
                 this.bulletController.bullets.forEach(bullet => {
-                    if (enemy.checkCollision(bullet)) {
-                        enemy.markedForDeletion = true;
+                    if (
+                        !bullet.markedForDeletion &&
+                        !enemy.markedForDeletion &&
+                        enemy.checkCollision(bullet)
+                    ) {
+                        enemy.health--;
                         bullet.markedForDeletion = true;
+
+                        if (enemy.health <= 0) {
+                            enemy.markedForDeletion = true;
+                            this.score += enemy.scoreValue;
+                        }
                     }
                 });
 
-                if (Math.random() < 0.02) { //esély az új spawnra tolteny
-                    const enemyCenterX = enemy.x + enemy.width / 2;
-                    const enemyCenterY = enemy.y + enemy.height / 2;
 
-                    const playerCenterX =
-                        this.player.x + this.player.width / 2;
-
-                    const playerCenterY =
-                        this.player.y + this.player.height / 2;
-
-                    const direction = getDirection(
-                        enemyCenterX,
-                        enemyCenterY,
-                        playerCenterX,
-                        playerCenterY
-                    );
-
-                    this.enemyBulletController.shoot(
-                        enemyCenterX,
-                        enemyCenterY,
-                        direction.x,
-                        direction.y
-                    );
+                if (Math.random() < enemy.type.fireChance) {
+                    enemy.weapon.fire(this.player);
 
                     enemy.state = 'fire';
-                    enemy.fireTimer = 10; //csak az animáció
+                    enemy.fireTimer = 10;
                 }
+
             });
             this.enemies = this.enemies.filter(e => !e.markedForDeletion);
 
@@ -232,31 +240,42 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
                     );
                 }
 
+
                 if (this.gameState === 'gameOver') {
                     context.font = 'bold 80px Arial';
-
+                    context.fillStyle = 'white';
                     context.fillText(
                         'GAME OVER',
                         this.width / 2,
-                        this.height / 2 - 60
+                        this.height / 2 - 100
                     );
 
                     context.font = 'bold 40px Arial';
-
                     context.fillText(
-                        'Score: 0',
+                        `Score: ${this.score}`,
                         this.width / 2,
-                        this.height / 2 + 20
+                        this.height / 2 - 20
                     );
 
-                    context.font = '28px Arial';
+                    if (this.newHighScore) {
+                        context.font = 'bold 40px Arial';
+                        context.fillStyle = 'yellow';
+                        context.fillText(
+                            `NEW HIGH SCORE: ${this.highScore}`,
+                            this.width / 2,
+                            this.height / 2 + 40
+                        );
+                    }
 
+                    context.fillStyle = 'white';
+                    context.font = '28px Arial';
                     context.fillText(
                         'PRESS ENTER TO CONTINUE',
                         this.width / 2,
-                        this.height / 2 + 100
+                        this.height / 2 + 110
                     );
                 }
+
 
                 context.restore();
             }

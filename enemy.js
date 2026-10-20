@@ -1,61 +1,27 @@
 import { ENEMY_TYPES } from './enemyTypes.js';
+import { EnemyWeapon } from './enemyWeapon.js';
+import { EnemyMovement } from './enemyMovement.js';
 
 const staggerFrames = 5;
 
-const animationStates = [
-    {
-        name: 'back',
-        frames: 1,
-    },
-    {
-        name: 'moving',
-        frames: 6,
-    },
-    {
-        name: 'fast',
-        frames: 6,
-    },
-    {
-        name: 'fire',
-        frames: 3,
-    },
-    {
-        name: 'pewPew',
-        frames: 1,
-    },
-    {
-        name: 'flip',
-        frames: 9,
-    },
-    {
-        name: 'left',
-        frames: 2,
-    },
-    {
-        name: 'right',
-        frames: 2,
-    },
-    {
-        name: 'hit',
-        frames: 10,
-    },
-    {
-        name: 'destroyed',
-        frames: 10,
-    }
-];
 
 
 export class Enemy {
     constructor(game, type = 'bomber') {
         this.game = game;
         this.typeName = type;
-
         this.type = ENEMY_TYPES[type];
 
         if (!this.type) {
             throw new Error(`Unknown enemy type: ${type}`);
         }
+
+        this.weapon = new EnemyWeapon(
+            this,
+            this.game.enemyBulletController
+        );
+
+        this.movement = new EnemyMovement(this);
 
         this.image = document.getElementById(this.type.imageId);
 
@@ -89,14 +55,13 @@ export class Enemy {
     }
 
     update() {
-        this.x -= this.speed;
+        this.movement.update();
         if (this.x + this.width < 0) this.markedForDeletion = true;
 
         if (this.fireTimer > 0) {
             this.fireTimer--;
-            this.state = 'fire';
-        } else {
-            this.state = 'fast'; // vagy ami az alapállapot
+        } else if (this.movement.dodgeTimer <= 0) {
+            this.state = 'fast';
         }
     }
 

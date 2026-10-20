@@ -8,8 +8,9 @@ export const ENEMY_TYPES = {
         speed: 4,
 
         fireChance: 0.08,
-        bulletSpeed: 10,
         bulletPattern: 'aimed',
+
+        movementType: 'dodge',
 
         frameWidth: 191,
         frameHeight: 191,
@@ -36,9 +37,10 @@ export const ENEMY_TYPES = {
         scoreValue: 200,
         speed: 2,
 
-        fireChance: 0.02,
-        bulletSpeed: 5,
-        bulletPattern: 'circular',
+        fireChance: 0.03,
+        bulletPattern: 'tripleQuad',
+
+        movementType: 'straight',
 
         frameWidth: 191,
         frameHeight: 191,
