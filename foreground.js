@@ -1,22 +1,43 @@
-let gameSpeed = 5;
+
+const gameSpeed = 5;
+const LAYER_COUNT = 8;
 
 export class Foreground {
     constructor(game) {
         this.game = game;
-        this.x = 0;
-        this.x2 = 2500;
-        this.y = 0;
-        this.width = this.game.width;
-        this.height = this.game.height;
-        this.layer1 = document.getElementById('F_layer1');
-        this.layer2 = document.getElementById('F_layer2');
+        this.width = game.width;
+        this.height = game.height;
+        this.layers = [];
+
+        for (let i = 1; i <= LAYER_COUNT; i++) {
+            const image = document.getElementById(`F_layer${i}`);
+
+            this.layers.push({
+                image,
+                x: (i - 1) * this.width
+            });
+        }
     }
-    draw (context){
-        context.drawImage(this.layer1, this.x, this.y, this.width, this.height);
-        context.drawImage(this.layer2, this.x2, this.y, this.width, this.height);
-        if (this.x < -2500) this.x = 2500 + this.x2 - gameSpeed;
-        else this.x -= gameSpeed;
-        if (this.x2 < -2500) this.x2 = 2500 + this.x - gameSpeed;
-        else this.x2 -= gameSpeed;
+
+    draw(context) {
+        for (const layer of this.layers) {
+            context.drawImage(
+                layer.image,
+                layer.x,
+                0,
+                this.width,
+                this.height
+            );
+
+            layer.x -= gameSpeed;
+
+            if (layer.x + this.width <= 0) {
+                const rightmostX = Math.max(
+                    ...this.layers.map(item => item.x)
+                );
+
+                layer.x = rightmostX + this.width - gameSpeed;
+            }
+        }
     }
 }

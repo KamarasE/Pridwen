@@ -40,6 +40,8 @@ export class Enemy {
         this.staggerFrames = 5;
         this.spriteAnimations = {};
 
+        this.hitboxSize=150;
+
         this.type.animations.forEach((state, index) => {
             const frames = { loc: [] };
 
@@ -107,8 +109,8 @@ export class Enemy {
         context.strokeRect(
             this.x,
             this.y,
-            this.width,
-            this.height
+            this.hitboxSize,
+            this.hitboxSize
         );
 
         context.restore();
@@ -121,12 +123,12 @@ export class Enemy {
 
         const closestX = Math.max(
             this.x,
-            Math.min(bullet.x, this.x + this.width)
+            Math.min(bullet.x, this.x + this.hitboxSize)
         );
 
         const closestY = Math.max(
             this.y,
-            Math.min(bullet.y, this.y + this.height)
+            Math.min(bullet.y, this.y + this.hitboxSize)
         );
 
         const dx = bullet.x - closestX;
