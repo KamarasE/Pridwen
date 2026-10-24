@@ -8,6 +8,7 @@ import { Enemy } from './enemy.js';
 import { EnemyBulletController } from './enemyBulletController.js';
 import { getDirection } from "./vector.js";
 import { Health } from "./health.js";
+import { DayNightCycle } from './dayNightCycle.js';
 
 
 const music = new Audio('./assets/music/pridwen.mp3');
@@ -33,6 +34,7 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
             this.score = 0;
             this.highScore = Number(localStorage.getItem('pridwenHighScore')) || 0;
             this.newHighScore = false;
+            this.dayNightCycle = new DayNightCycle();
 
             this.background = new Background(this); //TODO Jobb lenne ha ezek egy helyen lennének 
             this.foreground = new Foreground(this);
@@ -80,6 +82,8 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
         }
 
         update() {
+            this.dayNightCycle.update();
+
             if (this.gameState === 'start') {
                 if (this.input.justPressed.includes('Enter')) {
                     this.startGame();
@@ -285,11 +289,46 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
     const game = new Game(canvas.width, canvas.height);
     console.log(game);
 
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        game.update();
-        game.draw(ctx);
-        requestAnimationFrame(animate);
+    //TEST
+let lastTime = 0;
+let frameCount = 0;
+let fpsTimer = 0;
+let currentFPS = 0;
+
+function animate(timestamp) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    game.update();
+    game.draw(ctx);
+
+    frameCount++;
+
+    if (lastTime !== 0) {
+        fpsTimer += timestamp - lastTime;
     }
-    animate();
+
+    lastTime = timestamp;
+
+    if (fpsTimer >= 1000) {
+        currentFPS = Math.round(frameCount * 1000 / fpsTimer);
+
+        console.log(`FPS: ${currentFPS}`);
+
+        frameCount = 0;
+        fpsTimer = 0;
+    }
+
+    requestAnimationFrame(animate);
+}
+
+requestAnimationFrame(animate);
+
+/* function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    game.update();
+    game.draw(ctx);
+    requestAnimationFrame(animate);
+}
+animate(); */
+
 });
