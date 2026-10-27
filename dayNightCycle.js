@@ -2,9 +2,9 @@
 export class DayNightCycle {
     constructor() {
         // Durations are measured in frames (assuming 60 FPS).
-        this.nightDuration = 5 * 60; // 5 seconds TESZTELÉSNEK
-        this.dayDuration = 5 * 60;   // 5 seconds
-        this.transitionDuration = 5 * 60; // 5 seconds
+        this.nightDuration = 5 * 60; // 30 seconds TESZTRE CSAK 5 TODO
+        this.dayDuration = 5 * 60;   // 30 seconds
+        this.transitionDuration = 10 * 60; // 10 seconds
 
         this.phase = 'day';
         this.timer = 0;

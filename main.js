@@ -9,6 +9,7 @@ import { EnemyBulletController } from './enemyBulletController.js';
 import { getDirection } from "./vector.js";
 import { Health } from "./health.js";
 import { DayNightCycle } from './dayNightCycle.js';
+import { HealthPickup } from './healthPickup.js';
 
 
 const music = new Audio('./assets/music/pridwen.mp3');
@@ -39,6 +40,9 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
             this.background = new Background(this); //TODO Jobb lenne ha ezek egy helyen lennének 
             this.foreground = new Foreground(this);
             this.paint = new Paint(this);
+
+
+            this.healthPickups = [];
 
             this.enemies = []; //TODO Jobb lenne ha ezekért a metódus felelne
             this.enemyTimer = 0;
@@ -73,6 +77,7 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
 
             // Restore health
             this.health.currentHealth = this.health.maxHealth;
+            this.healthPickups = [];
 
             // Clear enemies and projectiles
             this.enemies = [];
@@ -203,9 +208,29 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
                         if (enemy.health <= 0 && !enemy.isDestroyed) {
                             enemy.playDestroyedAnimation();
                             this.score += enemy.scoreValue;
+
+                            if (
+                                this.health.currentHealth < this.health.maxHealth &&
+                                Math.random() < 0.5
+                            ) {
+                                this.healthPickups.push(
+                                    new HealthPickup(
+                                        this,
+                                        enemy.x + enemy.width / 2,
+                                        enemy.y + enemy.height / 2
+                                    )
+                                );
+                            }
                         }
                     }
                 });
+
+
+                this.healthPickups.forEach(pickup => pickup.update());
+
+                this.healthPickups = this.healthPickups.filter(
+                    pickup => !pickup.markedForDeletion
+                );
 
 
                 if (
@@ -234,6 +259,12 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
         }
 
         draw(context) {
+            document.body.style.setProperty(
+                '--day-alpha',
+                this.dayNightCycle.dayAlpha
+            );
+
+
             this.paint.draw(context);
             this.background.draw(context);
             this.foreground.draw(context);
@@ -241,6 +272,7 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
             this.player.draw(context);
             this.enemies.forEach(enemy => enemy.draw(context));
             this.enemyBulletController.draw(context);
+            this.healthPickups.forEach(pickup => pickup.draw(context));
             this.health.draw(context);
 
             if (

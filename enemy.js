@@ -43,7 +43,7 @@ export class Enemy {
 
         this.spriteAnimations = {};
 
-        this.hitboxSize = 150;
+        this.hitboxSize = 190;
 
         this.type.animations.forEach((state, index) => {
             const frames = { loc: [] };

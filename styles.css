@@ -33,3 +33,36 @@
 .paint {
     display: none;
 }
+
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: #080d1b;
+    overflow-x: hidden;
+    position: relative;
+    isolation: isolate;
+}
+
+/* Website background images */
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    pointer-events: none;
+}
+
+body::before {
+    background-image: url("assets/1_Backgrounds/Night.jpg");
+    opacity: 1;
+}
+
+body::after {
+    background-image: url("assets/1_Backgrounds/Day.jpg");
+    opacity: var(--day-alpha, 1);
+}
