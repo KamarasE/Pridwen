@@ -1,5 +1,3 @@
-const staggerFrames = 5;
-
 const animationStates = [
     {
         name: 'back',
@@ -46,13 +44,28 @@ const animationStates = [
 export class Player {
     constructor(game) {
         this.game = game;
+        // Source frame dimensions in the sprite sheet
+        this.frameWidth = 192;
+        this.frameHeight = 192;
+
+        // Display dimensions on the game canvas
         this.width = 192;
-        this.height = 191;
+        this.height = 192;
+
         this.x = 0;
         this.y = this.game.height - this.height;
         this.image = document.getElementById('player');
         this.speed = 10;
         this.hitboxRadius = 8;
+        this.isDestroyed = false;
+
+
+
+        this.invulnerabilityDuration = 60; // 60 frames, approximately 1 second
+        this.invulnerabilityTimer = 0;
+        this.hitAnimationTimer = 0;
+        this.hitAnimationDuration = 9 * this.staggerFrames;
+
 
         this.state = 'moving';
         this.frame = 0;
@@ -67,8 +80,8 @@ export class Player {
             };
 
             for (let i = 0; i < state.frames; i++) {
-                const posX = i * this.width;
-                const posY = index * this.height;
+                const posX = i * this.frameWidth;
+                const posY = index * this.frameHeight;
 
                 frames.loc.push({
                     x: posX,
@@ -81,37 +94,54 @@ export class Player {
         console.log(animationStates);
     }
     update(input) {
-        this.state = 'moving';
+
+        if (this.isDestroyed) {
+            return;
+        }
+
+
+
+        const isHit = this.invulnerabilityTimer > 0;
+
+        if (this.invulnerabilityTimer > 0) {
+            this.invulnerabilityTimer--;
+        }
+
+        if (!isHit) {
+            this.state = 'moving';
+        }
+
+
 
         let dx = 0;
         let dy = 0;
 
         if (input.includes('w')) {
             dy -= 1;
-            this.state = 'left';
+            if (!isHit) this.state = 'left';
         }
 
         if (input.includes('a')) {
             dx -= 1;
-            this.state = 'back';
+            if (!isHit) this.state = 'back';
         }
 
         if (input.includes('s')) {
             dy += 1;
-            this.state = 'right';
+            if (!isHit) this.state = 'right';
         }
 
         if (input.includes('d')) {
             dx += 1;
-            this.state = 'fast';
+            if (!isHit) this.state = 'fast';
         }
 
         if (input.includes('Enter')) {
-            this.state = 'fire';
+            if (!isHit) this.state = 'fire';
         }
 
         if (input.includes('Shift')) {
-            this.state = 'flip';
+            if (!isHit) this.state = 'flip';
             dx += 1.3;
         }
 
@@ -134,25 +164,6 @@ export class Player {
             this.y = this.game.height - this.height;
     }
 
-    shoot(bulletController) {
-        if (this.shootCooldown > 0) {
-            this.shootCooldown--;
-        }
-
-        if (this.shootCooldown <= 0) {
-            const bulletX = this.x + this.width - 20;
-            const bulletY = this.y + this.height / 2;
-
-            bulletController.shoot(
-                bulletX,
-                bulletY
-            );
-
-            this.shootCooldown = this.shootInterval;
-        }
-    }
-
-
     draw(context) {
         const animation = this.spriteAnimations[this.state];
 
@@ -163,12 +174,14 @@ export class Player {
         const frameX = animation.loc[cursor].x;
         const frameY = animation.loc[cursor].y;
 
+
+
         context.drawImage(
             this.image,
             frameX,
             frameY,
-            this.width,
-            this.height,
+            this.frameWidth,
+            this.frameHeight,
             this.x,
             this.y,
             this.width,
@@ -192,5 +205,52 @@ export class Player {
         context.stroke();
 
         context.restore();
+    }
+
+    shoot(bulletController) {
+        if (this.shootCooldown > 0) {
+            this.shootCooldown--;
+        }
+
+        if (this.shootCooldown <= 0) {
+            const bulletX = this.x + this.width - 20;
+            const bulletY = this.y + this.height / 2;
+
+            bulletController.shoot(
+                bulletX,
+                bulletY
+            );
+
+            this.shootCooldown = this.shootInterval;
+        }
+    }
+
+    playDestroyedAnimation() {
+        if (this.isDestroyed) return;
+
+        this.isDestroyed = true;
+        this.state = 'destroyed';
+        this.frame = 0;
+    }
+
+    isDestroyedAnimationFinished() {
+        const totalFrames = this.spriteAnimations.destroyed.loc.length;
+        return this.frame >= totalFrames * this.staggerFrames;
+    }
+
+    takeDamage(health) {
+        if (this.invulnerabilityTimer > 0) {
+            return;
+        }
+
+        if (health.currentHealth > 0) {
+            health.currentHealth--;
+            this.invulnerabilityTimer = this.invulnerabilityDuration;
+
+            this.state = 'hit';
+            this.frame = 0;
+
+            console.log("Player HIT!");
+        }
     }
 }

@@ -12,8 +12,8 @@ export const ENEMY_TYPES = {
 
         movementType: 'dodge',
 
-        frameWidth: 191,
-        frameHeight: 191,
+        frameWidth: 192,
+        frameHeight: 192,
 
         animations: [
             { name: 'back', frames: 1 },
@@ -42,8 +42,8 @@ export const ENEMY_TYPES = {
 
         movementType: 'straight',
 
-        frameWidth: 191,
-        frameHeight: 191,
+        frameWidth: 192,
+        frameHeight: 192,
 
         animations: [ // EZ HIBÁS, MÁSAK AZ ANIMÁCIÓK, CSAK IDEIGLENESEN VAN ÍGY
             { name: 'back', frames: 1 },

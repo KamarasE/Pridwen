@@ -68,6 +68,9 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
             this.score = 0;
             this.newHighScore = false;
 
+            this.player.isDestroyed = false;
+            this.player.invulnerabilityTimer = 0;
+
             // Restore health
             this.health.currentHealth = this.health.maxHealth;
 
@@ -124,21 +127,29 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
             this.enemyBulletController.checkCollisions(this.player, this.health);
 
             if (this.health.currentHealth <= 0) {
-                this.gameState = 'gameOver';
-
-                if (this.score > this.highScore) {
-                    this.highScore = this.score;
-                    this.newHighScore = true;
-
-                    localStorage.setItem(
-                        'pridwenHighScore',
-                        this.highScore
-                    );
-                } else {
-                    this.newHighScore = false;
+                if (!this.player.isDestroyed) {
+                    this.player.playDestroyedAnimation();
                 }
 
-                music.pause();
+                if (this.player.isDestroyedAnimationFinished()) {
+                    this.gameState = 'gameOver';
+
+                    if (this.score > this.highScore) {
+                        this.highScore = this.score;
+                        this.newHighScore = true;
+
+                        localStorage.setItem(
+                            'pridwenHighScore',
+                            this.highScore
+                        );
+                    } else {
+                        this.newHighScore = false;
+                    }
+
+                    music.pause();
+                }
+
+                this.input.update();
                 return;
             }
 
@@ -179,20 +190,28 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
                     if (
                         !bullet.markedForDeletion &&
                         !enemy.markedForDeletion &&
+                        !enemy.isDestroyed &&
                         enemy.checkCollision(bullet)
                     ) {
                         enemy.health--;
                         bullet.markedForDeletion = true;
 
-                        if (enemy.health <= 0) {
-                            enemy.markedForDeletion = true;
+                        enemy.state = 'hit';
+                        enemy.frame = 0;
+                        enemy.hitAnimationTimer = enemy.hitAnimationDuration;
+
+                        if (enemy.health <= 0 && !enemy.isDestroyed) {
+                            enemy.playDestroyedAnimation();
                             this.score += enemy.scoreValue;
                         }
                     }
                 });
 
 
-                if (Math.random() < enemy.type.fireChance) {
+                if (
+                    !enemy.isDestroyed &&
+                    Math.random() < enemy.type.fireChance
+                ) {
                     enemy.weapon.fire(this.player);
 
                     enemy.state = 'fire';
@@ -200,6 +219,15 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
                 }
 
             });
+            this.enemies.forEach(enemy => {
+                if (
+                    enemy.isDestroyed &&
+                    enemy.isDestroyedAnimationFinished()
+                ) {
+                    enemy.markedForDeletion = true;
+                }
+            });
+
             this.enemies = this.enemies.filter(e => !e.markedForDeletion);
 
             this.input.update();
@@ -290,45 +318,45 @@ window.addEventListener('load', function () { //LOAD esemény, futás előtt meg
     console.log(game);
 
     //TEST
-let lastTime = 0;
-let frameCount = 0;
-let fpsTimer = 0;
-let currentFPS = 0;
+    let lastTime = 0;
+    let frameCount = 0;
+    let fpsTimer = 0;
+    let currentFPS = 0;
 
-function animate(timestamp) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function animate(timestamp) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    game.update();
-    game.draw(ctx);
+        game.update();
+        game.draw(ctx);
 
-    frameCount++;
+        frameCount++;
 
-    if (lastTime !== 0) {
-        fpsTimer += timestamp - lastTime;
-    }
+        if (lastTime !== 0) {
+            fpsTimer += timestamp - lastTime;
+        }
 
-    lastTime = timestamp;
+        lastTime = timestamp;
 
-    if (fpsTimer >= 1000) {
-        currentFPS = Math.round(frameCount * 1000 / fpsTimer);
+        if (fpsTimer >= 1000) {
+            currentFPS = Math.round(frameCount * 1000 / fpsTimer);
 
-        console.log(`FPS: ${currentFPS}`);
+            console.log(`FPS: ${currentFPS}`);
 
-        frameCount = 0;
-        fpsTimer = 0;
+            frameCount = 0;
+            fpsTimer = 0;
+        }
+
+        requestAnimationFrame(animate);
     }
 
     requestAnimationFrame(animate);
-}
 
-requestAnimationFrame(animate);
-
-/* function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    game.update();
-    game.draw(ctx);
-    requestAnimationFrame(animate);
-}
-animate(); */
+    /* function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        game.update();
+        game.draw(ctx);
+        requestAnimationFrame(animate);
+    }
+    animate(); */
 
 });

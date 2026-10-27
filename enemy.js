@@ -2,7 +2,6 @@ import { ENEMY_TYPES } from './enemyTypes.js';
 import { EnemyWeapon } from './enemyWeapon.js';
 import { EnemyMovement } from './enemyMovement.js';
 
-const staggerFrames = 5;
 
 
 
@@ -24,6 +23,7 @@ export class Enemy {
         this.movement = new EnemyMovement(this);
 
         this.image = document.getElementById(this.type.imageId);
+        this.isDestroyed = false;
 
         this.maxHealth = this.type.maxHealth;
         this.health = this.type.maxHealth;
@@ -38,9 +38,12 @@ export class Enemy {
         this.markedForDeletion = false;
         this.state = "fast";
         this.staggerFrames = 5;
+        this.hitAnimationTimer = 0;
+        this.hitAnimationDuration = 9 * this.staggerFrames;
+
         this.spriteAnimations = {};
 
-        this.hitboxSize=150;
+        this.hitboxSize = 150;
 
         this.type.animations.forEach((state, index) => {
             const frames = { loc: [] };
@@ -56,16 +59,32 @@ export class Enemy {
         });
     }
 
-    update() {
-        this.movement.update();
-        if (this.x + this.width < 0) this.markedForDeletion = true;
 
-        if (this.fireTimer > 0) {
+    update() {
+
+        if (this.isDestroyed) {
+            return;
+        }
+
+        if (this.hitAnimationTimer > 0) {
+            this.hitAnimationTimer--;
+        }
+
+        this.movement.update();
+
+        if (this.x + this.width < 0) {
+            this.markedForDeletion = true;
+        }
+
+        if (this.hitAnimationTimer > 0) {
+            this.state = 'hit';
+        } else if (this.fireTimer > 0) {
             this.fireTimer--;
         } else if (this.movement.dodgeTimer <= 0) {
             this.state = 'fast';
         }
     }
+
 
     draw(context) {
         const animation = this.spriteAnimations[this.state];
@@ -117,6 +136,20 @@ export class Enemy {
         //
 
         this.frame++;
+    }
+
+    isDestroyedAnimationFinished() {
+        const totalFrames = this.spriteAnimations.destroyed.loc.length;
+        return this.frame >= totalFrames * this.staggerFrames;
+    }
+
+    playDestroyedAnimation() {
+        if (this.isDestroyed) return;
+
+        this.isDestroyed = true;
+        this.state = 'destroyed';
+        this.frame = 0;
+        this.hitAnimationTimer = 0;
     }
 
     checkCollision(bullet) {
