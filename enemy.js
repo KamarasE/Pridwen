@@ -43,7 +43,9 @@ export class Enemy {
 
         this.spriteAnimations = {};
 
-        this.hitboxSize = 190;
+        this.hitboxWidth = this.type.hitboxWidth;
+        this.hitboxHeight = this.type.hitboxHeight;
+        this.hitboxOffsetY = this.type.hitboxOffsetY ?? 0;
 
         this.type.animations.forEach((state, index) => {
             const frames = { loc: [] };
@@ -123,13 +125,13 @@ export class Enemy {
 
         context.save();
 
-        context.strokeStyle = 'yellow';
+        context.strokeStyle = 'yellow'; //TODO törlésre
         context.lineWidth = 2;
         context.strokeRect(
             this.x,
-            this.y,
-            this.hitboxSize,
-            this.hitboxSize
+            this.y + this.hitboxOffsetY,
+            this.hitboxWidth,
+            this.hitboxHeight
         );
 
         context.restore();
@@ -153,22 +155,21 @@ export class Enemy {
     }
 
     checkCollision(bullet) {
+        const hitboxY = this.y + this.hitboxOffsetY;
 
         const closestX = Math.max(
             this.x,
-            Math.min(bullet.x, this.x + this.hitboxSize)
+            Math.min(bullet.x, this.x + this.hitboxWidth)
         );
 
         const closestY = Math.max(
-            this.y,
-            Math.min(bullet.y, this.y + this.hitboxSize)
+            hitboxY,
+            Math.min(bullet.y, hitboxY + this.hitboxHeight)
         );
 
         const dx = bullet.x - closestX;
         const dy = bullet.y - closestY;
 
-        const distance = Math.hypot(dx, dy);
-
-        return distance < bullet.radius;
+        return Math.hypot(dx, dy) < bullet.radius;
     }
 }

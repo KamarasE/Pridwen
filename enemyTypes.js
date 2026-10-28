@@ -15,6 +15,10 @@ export const ENEMY_TYPES = {
         frameWidth: 192,
         frameHeight: 192,
 
+        hitboxWidth: 190,
+        hitboxHeight: 80,
+        hitboxOffsetY: 40,
+
         animations: [
             { name: 'back', frames: 1 },
             { name: 'moving', frames: 6 },
@@ -44,6 +48,10 @@ export const ENEMY_TYPES = {
 
         frameWidth: 192,
         frameHeight: 192,
+
+        hitboxWidth: 190,
+        hitboxHeight: 100,
+        hitboxOffsetY: 20,
 
         animations: [ // EZ HIBÁS, MÁSAK AZ ANIMÁCIÓK, CSAK IDEIGLENESEN VAN ÍGY
             { name: 'back', frames: 1 },
