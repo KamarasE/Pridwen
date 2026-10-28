@@ -52,8 +52,8 @@ export class Enemy {
 
             for (let i = 0; i < state.frames; i++) {
                 frames.loc.push({
-                    x: i * this.type.frameWidth,
-                    y: index * this.type.frameHeight
+                    x: (state.startX ?? 0) + i * this.type.frameWidth,
+                    y: state.startY ?? index * this.type.frameHeight
                 });
             }
 

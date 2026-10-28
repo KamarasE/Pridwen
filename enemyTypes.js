@@ -29,7 +29,7 @@ export const ENEMY_TYPES = {
             { name: 'left', frames: 2 },
             { name: 'right', frames: 2 },
             { name: 'hit', frames: 10 },
-            { name: 'destroyed', frames: 10 }
+            { name: 'destroyed', frames: 10, startY: 1742 }
         ]
     },
 
@@ -62,8 +62,8 @@ export const ENEMY_TYPES = {
             { name: 'flip', frames: 7 },
             { name: 'left', frames: 6 },
             { name: 'right', frames: 8 },
-            { name: 'hit', frames: 10 },
-            { name: 'destroyed', frames: 21 }
+            { name: 'hit', frames: 10, startX: -5, startY: 1560 },
+            { name: 'destroyed', frames: 21, startY: 1760 }
         ]
     }
 };

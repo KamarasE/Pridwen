@@ -2,6 +2,8 @@ const animationStates = [
     {
         name: 'back',
         frames: 1,
+        startX: 0,
+        startY: 5
     },
     {
         name: 'moving',
@@ -18,26 +20,35 @@ const animationStates = [
     {
         name: 'pewPew',
         frames: 2,
+
     },
     {
         name: 'flip',
         frames: 8,
+        startY: 960,
     },
     {
         name: 'left',
         frames: 4,
+
     },
     {
         name: 'right',
         frames: 4,
+
     },
     {
         name: 'hit',
         frames: 9,
+        startX: 5,
+        startY: 1545,
+
     },
     {
         name: 'destroyed',
         frames: 15,
+        startX: 5,
+        startY: 1737,
     }
 ];
 
@@ -80,8 +91,8 @@ export class Player {
             };
 
             for (let i = 0; i < state.frames; i++) {
-                const posX = i * this.frameWidth;
-                const posY = index * this.frameHeight;
+                const posX = (state.startX ?? 0) + i * this.width;
+                const posY = state.startY ?? index * this.height;
 
                 frames.loc.push({
                     x: posX,
@@ -244,7 +255,7 @@ export class Player {
         }
 
         if (health.currentHealth > 0) {
-            health.currentHealth--;
+            //health.currentHealth--; TODO TESZT
             this.invulnerabilityTimer = this.invulnerabilityDuration;
 
             this.state = 'hit';
